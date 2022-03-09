@@ -381,7 +381,7 @@ class Root extends Folder implements IRootFolder {
 		$userId = $userObject->getUID();
 
 		if (!$this->userFolderCache->hasKey($userId)) {
-			$folder = new LazyFolder(function () use ($userId) {
+			$folderCallback = function () use ($userId) {
 				try {
 					return $this->get('/' . $userId . '/files');
 				} catch (NotFoundException $e) {
@@ -390,10 +390,15 @@ class Root extends Folder implements IRootFolder {
 					}
 					return $this->newFolder('/' . $userId . '/files');
 				}
-			}, [
-				'path' => '/' . $userId . '/files',
-				'permissions' => Constants::PERMISSION_ALL,
-			]);
+			};
+			if ($this->mountManager->getSetupManager()->isSetupComplete($userObject)) {
+				$folder = $folderCallback();
+			} else {
+				$folder = new LazyFolder($folderCallback, [
+					'path' => '/' . $userId . '/files',
+					'permissions' => Constants::PERMISSION_ALL,
+				]);
+			}
 
 			$this->userFolderCache->set($userId, $folder);
 		}
