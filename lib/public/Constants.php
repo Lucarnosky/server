@@ -60,10 +60,4 @@ class Constants {
 	 * cf. sharing.maxAutocompleteResults in config.sample.php.
 	 */
 	public const SHARING_MAX_AUTOCOMPLETE_RESULTS_DEFAULT = 25;
-
-	/**
-	 * @since 24.0.0 Indicates how many rows can be deleted at once with MySQL
-	 * database server.
-	 */
-	public const MAX_ROW_DELETION_MYSQL = 100000;
 }

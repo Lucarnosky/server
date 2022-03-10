@@ -36,7 +36,6 @@ use OCP\AutoloadNotAllowedException;
 use OCP\BackgroundJob\IJob;
 use OCP\BackgroundJob\IJobList;
 use OCP\DB\QueryBuilder\IQueryBuilder;
-use OCP\Constants;
 use OCP\IConfig;
 use OCP\IDBConnection;
 
@@ -121,7 +120,7 @@ class JobList implements IJobList {
 		// Stops us hitting wsrep_max_ws_rows when large row counts are deleted
 		if ($this->connection->getDatabasePlatform() instanceof MySQLPlatform) {
 			// Then use chunked delete
-			$max = Constants::MAX_ROW_DELETION_MYSQL;
+			$max = IQueryBuilder::MAX_ROW_DELETION;
 
 			$query->setMaxResults($max);
 
