@@ -36,6 +36,7 @@
 namespace OCA\Files_Sharing\Tests;
 
 use OC\Files\Cache\Scanner;
+use OC\Files\SetupManager;
 use OCA\Files_Sharing\Controller\ShareAPIController;
 use OCP\App\IAppManager;
 use OCP\AppFramework\OCS\OCSBadRequestException;
@@ -47,6 +48,8 @@ use OCP\IL10N;
 use OCP\IPreview;
 use OCP\IRequest;
 use OCP\IServerContainer;
+use OCP\IUser;
+use OCP\IUserManager;
 use OCP\Share\IShare;
 use OCP\UserStatus\IManager as IUserStatusManager;
 
@@ -67,6 +70,9 @@ class ApiTest extends TestCase {
 
 	/** @var string */
 	private $subsubfolder;
+
+	/** @var IUserManager */
+	private $userManager;
 
 	protected function setUp(): void {
 		parent::setUp();
@@ -91,6 +97,7 @@ class ApiTest extends TestCase {
 		$mount->getStorage()->getScanner()->scan('', Scanner::SCAN_RECURSIVE);
 
 		$this->userFolder = \OC::$server->getUserFolder(self::TEST_FILES_SHARING_API_USER1);
+		$this->userManager = \OC::$server->get(IUserManager::class);
 	}
 
 	protected function tearDown(): void {
@@ -693,6 +700,11 @@ class ApiTest extends TestCase {
 		$share1->setStatus(IShare::STATUS_ACCEPTED);
 		$this->shareManager->updateShare($share1);
 
+		$user = $this->userManager->get(self::TEST_FILES_SHARING_API_USER2);
+		/** @var SetupManager $setupManager */
+		$setupManager = \OC::$server->get(SetupManager::class);
+		$setupManager->setupForUser($user);
+
 		$node2 = \OC::$server->getRootFolder()->getUserFolder(self::TEST_FILES_SHARING_API_USER2)->get($this->subfolder);
 		$share2 = $this->shareManager->newShare();
 		$share2->setNode($node2)
@@ -1133,6 +1145,11 @@ class ApiTest extends TestCase {
 		$share1 = $this->shareManager->createShare($share1);
 		$share1->setStatus(IShare::STATUS_ACCEPTED);
 		$this->shareManager->updateShare($share1);
+
+		$user = $this->userManager->get(self::TEST_FILES_SHARING_API_USER2);
+		/** @var SetupManager $setupManager */
+		$setupManager = \OC::$server->get(SetupManager::class);
+		$setupManager->setupForUser($user);
 
 		$user2folder = \OC::$server->getUserFolder(self::TEST_FILES_SHARING_API_USER2);
 		$node2 = $user2folder->get($this->folder.'/'.$this->filename);
