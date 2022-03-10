@@ -152,7 +152,11 @@ class MountConfig {
 	 */
 	public static function readData($user = null) {
 		if (isset($user)) {
-			$jsonFile = \OC::$server->getUserManager()->get($user)->getHome() . '/mount.json';
+			$user = \OC::$server->getUserManager()->get($user);
+			if (!$user) {
+				return [];
+			}
+			$jsonFile = $user->getHome() . '/mount.json';
 		} else {
 			$config = \OC::$server->getConfig();
 			$datadir = $config->getSystemValue('datadirectory', \OC::$SERVERROOT . '/data/');
