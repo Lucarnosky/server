@@ -42,14 +42,20 @@ use OCP\Diagnostics\IEventLogger;
 use OCP\EventDispatcher\IEventDispatcher;
 use OCP\Files\Config\IMountProvider;
 use OCP\Files\Config\IUserMountCache;
+use OCP\Files\Events\InvalidateMountCacheEvent;
 use OCP\Files\Events\Node\FilesystemTornDownEvent;
 use OCP\Files\Mount\IMountManager;
 use OCP\Files\Mount\IMountPoint;
 use OCP\Files\NotFoundException;
 use OCP\Files\Storage\IStorage;
+use OCP\Group\Events\UserAddedEvent;
+use OCP\Group\Events\UserRemovedEvent;
+use OCP\ICache;
+use OCP\ICacheFactory;
 use OCP\IUser;
 use OCP\IUserManager;
 use OCP\Lockdown\ILockdownManager;
+use OCP\Share\Events\ShareCreatedEvent;
 
 class SetupManager {
 	private bool $rootSetup = false;
@@ -66,6 +72,7 @@ class SetupManager {
 	private IEventDispatcher $eventDispatcher;
 	private IUserMountCache $userMountCache;
 	private ILockdownManager $lockdownManager;
+	private ICache $cache;
 	private bool $listeningForProviders;
 
 	public function __construct(
@@ -75,7 +82,8 @@ class SetupManager {
 		IUserManager $userManager,
 		IEventDispatcher $eventDispatcher,
 		IUserMountCache $userMountCache,
-		ILockdownManager $lockdownManager
+		ILockdownManager $lockdownManager,
+		ICacheFactory $cacheFactory
 	) {
 		$this->eventLogger = $eventLogger;
 		$this->mountProviderCollection = $mountProviderCollection;
@@ -84,7 +92,21 @@ class SetupManager {
 		$this->eventDispatcher = $eventDispatcher;
 		$this->userMountCache = $userMountCache;
 		$this->lockdownManager = $lockdownManager;
+		$this->cache = $cacheFactory->createDistributed('setupmanager::');
 		$this->listeningForProviders = false;
+
+		$this->eventDispatcher->addListener(UserAddedEvent::class, function(UserAddedEvent $event) {
+			$this->cache->remove($event->getUser()->getUID());
+		});
+		$this->eventDispatcher->addListener(UserRemovedEvent::class, function(UserRemovedEvent $event) {
+			$this->cache->remove($event->getUser()->getUID());
+		});
+		$eventDispatcher->addListener(ShareCreatedEvent::class, function(ShareCreatedEvent $event) {
+			$this->cache->remove($event->getShare()->getSharedWith());
+		});
+		$eventDispatcher->addListener(InvalidateMountCacheEvent::class, function(InvalidateMountCacheEvent $event) {
+			$this->cache->remove($event->getUser()->getUID());
+		});
 	}
 
 	private function isSetupStarted(IUser $user): bool {
@@ -305,6 +327,16 @@ class SetupManager {
 		}
 
 		if ($this->isSetupComplete($user)) {
+			return;
+		}
+
+		// we perform a "cached" setup only after having done the full setup recently
+		// this is also used to trigger a full setup after handling events that are likely
+		// to change the available mounts
+		$cachedSetup = $this->cache->get($user->getUID());
+		if (!$cachedSetup) {
+			$this->setupForUser($user);
+			$this->cache->set($user->getUID(), true, 5 * 60);
 			return;
 		}
 

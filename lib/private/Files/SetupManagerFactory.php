@@ -28,6 +28,7 @@ use OCP\EventDispatcher\IEventDispatcher;
 use OCP\Files\Config\IMountProviderCollection;
 use OCP\Files\Config\IUserMountCache;
 use OCP\Files\Mount\IMountManager;
+use OCP\ICacheFactory;
 use OCP\IUserManager;
 use OCP\Lockdown\ILockdownManager;
 
@@ -39,6 +40,7 @@ class SetupManagerFactory {
 	private IUserMountCache $userMountCache;
 	private ILockdownManager $lockdownManager;
 	private ?SetupManager $setupManager;
+	private ICacheFactory $cacheFactory;
 
 	public function __construct(
 		IEventLogger $eventLogger,
@@ -46,7 +48,8 @@ class SetupManagerFactory {
 		IUserManager $userManager,
 		IEventDispatcher $eventDispatcher,
 		IUserMountCache $userMountCache,
-		ILockdownManager $lockdownManager
+		ILockdownManager $lockdownManager,
+		ICacheFactory $cacheFactory
 	) {
 		$this->eventLogger = $eventLogger;
 		$this->mountProviderCollection = $mountProviderCollection;
@@ -54,12 +57,21 @@ class SetupManagerFactory {
 		$this->eventDispatcher = $eventDispatcher;
 		$this->userMountCache = $userMountCache;
 		$this->lockdownManager = $lockdownManager;
+		$this->cacheFactory = $cacheFactory;
 		$this->setupManager = null;
 	}
 
 	public function create(IMountManager $mountManager): SetupManager {
 		if (!$this->setupManager) {
-			$this->setupManager = new SetupManager($this->eventLogger, $this->mountProviderCollection, $mountManager, $this->userManager, $this->eventDispatcher, $this->userMountCache, $this->lockdownManager);
+			$this->setupManager = new SetupManager($this->eventLogger,
+				$this->mountProviderCollection,
+				$mountManager,
+				$this->userManager,
+				$this->eventDispatcher,
+				$this->userMountCache,
+				$this->lockdownManager,
+				$this->cacheFactory
+			);
 		}
 		return $this->setupManager;
 	}
