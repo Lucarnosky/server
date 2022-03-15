@@ -42,7 +42,6 @@ use OCP\PreConditionNotMetException;
 class ConfigController extends OCSController {
 
 	protected string $userId;
-	protected string $serverRoot;
 	private IConfig $config;
 	private IUserSession $userSession;
 	private AccessibilityProvider $accessibilityProvider;
