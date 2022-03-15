@@ -33,21 +33,12 @@ use OCP\IURLGenerator;
 
 class AccessibilityProvider {
 
-	/** @var string */
-	protected $appName;
-
-	/** @var IURLGenerator */
-	private $urlGenerator;
-
-	/** @var IL10N */
-	private $l;
+	protected string $appName;
+	private IURLGenerator $urlGenerator;
+	private IL10N $l;
 
 	/**
 	 * Account constructor.
-	 *
-	 * @param string $appName
-	 * @param IURLGenerator $urlGenerator
-	 * @param IL10N $l
 	 */
 	public function __construct(string $appName,
 								IURLGenerator $urlGenerator,
@@ -57,7 +48,10 @@ class AccessibilityProvider {
 		$this->l = $l;
 	}
 
-	public function getThemes() {
+	/**
+	 * @psalm-return array<array-key, array{id: string, img: string, title: string, enableLabel: string, text: string}>
+	 */
+	public function getThemes(): array {
 		return [
 			[
 				'id' => 'dark',
@@ -69,6 +63,9 @@ class AccessibilityProvider {
 		];
 	}
 
+	/**
+	 * @psalm-return array{id: string, img: string, title: string, enableLabel: string, text: string}
+	 */
 	public function getHighContrast() {
 		return [
 			'id' => 'highcontrast',
@@ -79,6 +76,9 @@ class AccessibilityProvider {
 		];
 	}
 
+	/**
+	 * @psalm-return array<array-key, array{id: string, img: string, title: string, enableLabel: string, text: string}>
+	 */
 	public function getFonts() {
 		return [
 			[
