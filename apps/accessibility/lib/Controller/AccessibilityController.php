@@ -56,7 +56,7 @@ class AccessibilityController extends Controller {
 	protected IconsCacher $iconsCacher;
 	private \OC_Defaults $defaults;
 	private ?string $injectedVariables = null;
-	private string $appRoott;
+	private string $appRoot;
 
 	/**
 	 * @param string $appName
