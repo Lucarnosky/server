@@ -37,34 +37,14 @@ use OCP\L10N\IFactory;
 
 class Provider implements IProvider {
 
-	/** @var IFactory */
-	protected $languageFactory;
+	protected IFactory $languageFactory;
+	protected IL10N $l;
+	protected IUrlGenerator $url;
+	protected ICommentsManager $commentsManager;
+	protected IUserManager $userManager;
+	protected IManager $activityManager;
+	protected array $displayNames = [];
 
-	/** @var IL10N */
-	protected $l;
-
-	/** @var IURLGenerator */
-	protected $url;
-
-	/** @var ICommentsManager */
-	protected $commentsManager;
-
-	/** @var IUserManager */
-	protected $userManager;
-
-	/** @var IManager */
-	protected $activityManager;
-
-	/** @var string[] */
-	protected $displayNames = [];
-
-	/**
-	 * @param IFactory $languageFactory
-	 * @param IURLGenerator $url
-	 * @param ICommentsManager $commentsManager
-	 * @param IUserManager $userManager
-	 * @param IManager $activityManager
-	 */
 	public function __construct(IFactory $languageFactory, IURLGenerator $url, ICommentsManager $commentsManager, IUserManager $userManager, IManager $activityManager) {
 		$this->languageFactory = $languageFactory;
 		$this->url = $url;
@@ -111,11 +91,9 @@ class Provider implements IProvider {
 	}
 
 	/**
-	 * @param IEvent $event
-	 * @return IEvent
 	 * @throws \InvalidArgumentException
 	 */
-	protected function parseShortVersion(IEvent $event) {
+	protected function parseShortVersion(IEvent $event): IEvent {
 		$subjectParameters = $this->getSubjectParameters($event);
 
 		if ($event->getSubject() === 'add_comment_subject') {
@@ -137,11 +115,9 @@ class Provider implements IProvider {
 	}
 
 	/**
-	 * @param IEvent $event
-	 * @return IEvent
 	 * @throws \InvalidArgumentException
 	 */
-	protected function parseLongVersion(IEvent $event) {
+	protected function parseLongVersion(IEvent $event): IEvent {
 		$subjectParameters = $this->getSubjectParameters($event);
 
 		if ($event->getSubject() === 'add_comment_subject') {
@@ -170,7 +146,7 @@ class Provider implements IProvider {
 		return $event;
 	}
 
-	protected function getSubjectParameters(IEvent $event) {
+	protected function getSubjectParameters(IEvent $event): array {
 		$subjectParameters = $event->getSubjectParameters();
 		if (isset($subjectParameters['fileId'])) {
 			return $subjectParameters;
@@ -190,10 +166,7 @@ class Provider implements IProvider {
 		];
 	}
 
-	/**
-	 * @param IEvent $event
-	 */
-	protected function parseMessage(IEvent $event) {
+	protected function parseMessage(IEvent $event): void {
 		$messageParameters = $event->getMessageParameters();
 		if (empty($messageParameters)) {
 			// Email
@@ -228,12 +201,7 @@ class Provider implements IProvider {
 		}
 	}
 
-	/**
-	 * @param int $id
-	 * @param string $path
-	 * @return array
-	 */
-	protected function generateFileParameter($id, $path) {
+	protected function generateFileParameter(int $id, string $path): array {
 		return [
 			'type' => 'file',
 			'id' => $id,
@@ -243,11 +211,7 @@ class Provider implements IProvider {
 		];
 	}
 
-	/**
-	 * @param string $uid
-	 * @return array
-	 */
-	protected function generateUserParameter($uid) {
+	protected function generateUserParameter(string $uid): array {
 		if (!isset($this->displayNames[$uid])) {
 			$this->displayNames[$uid] = $this->getDisplayName($uid);
 		}
@@ -259,16 +223,11 @@ class Provider implements IProvider {
 		];
 	}
 
-	/**
-	 * @param string $uid
-	 * @return string
-	 */
-	protected function getDisplayName($uid) {
+	protected function getDisplayName(string $uid): string {
 		$user = $this->userManager->get($uid);
 		if ($user instanceof IUser) {
 			return $user->getDisplayName();
-		} else {
-			return $uid;
 		}
+		return $uid;
 	}
 }
