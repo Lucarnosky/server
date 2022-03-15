@@ -52,11 +52,9 @@ class Notifications extends Controller {
 
 	/**
 	 * Notifications constructor.
-	 *
-	 * @param string $appName
 	 */
 	public function __construct(
-		$appName,
+		string $appName,
 		IRequest $request,
 		ICommentsManager $commentsManager,
 		IRootFolder $rootFolder,
