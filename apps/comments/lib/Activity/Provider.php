@@ -43,7 +43,7 @@ class Provider implements IProvider {
 	protected ICommentsManager $commentsManager;
 	protected IUserManager $userManager;
 	protected IManager $activityManager;
-	/** @param string[] $displayNames */
+	/** @param string[] */
 	protected array $displayNames = [];
 
 	public function __construct(IFactory $languageFactory, IURLGenerator $url, ICommentsManager $commentsManager, IUserManager $userManager, IManager $activityManager) {
