@@ -100,8 +100,8 @@ class CommentersSorter implements ISorter {
 		$a = $a['value']['shareWith'];
 		$b = $b['value']['shareWith'];
 
-		$valueA = isset($commenters[$a]) ? $commenters[$a] : 0;
-		$valueB = isset($commenters[$b]) ? $commenters[$b] : 0;
+		$valueA = $commenters[$a] ?? 0;
+		$valueB = $commenters[$b] ?? 0;
 
 		return $valueB - $valueA;
 	}
