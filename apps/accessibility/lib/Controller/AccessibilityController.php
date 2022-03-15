@@ -55,7 +55,7 @@ class AccessibilityController extends Controller {
 	private IUserSession $userSession;
 	protected IconsCacher $iconsCacher;
 	private \OC_Defaults $defaults;
-	private ?string $injectedVariables = null; = null
+	private ?string $injectedVariables = null;
 	private string $appRoott;
 
 	/**
