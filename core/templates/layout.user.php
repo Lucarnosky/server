@@ -60,7 +60,7 @@ $getUserAvatar = static function (int $size) use ($_): string {
 					id="nextcloud">
 					<div class="logo logo-icon">
 						<h1 class="hidden-visually">
-							<?php p($theme->getName()); ?> <?php p(!empty($_['application'])?$_['application']: $l->t('Apps')); ?>
+							<?php p($l->t('$1\'s homepage', [$theme->getName()])); ?>
 						</h1>
 					</div>
 				</a>

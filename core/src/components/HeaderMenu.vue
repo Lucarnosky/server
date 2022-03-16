@@ -174,8 +174,8 @@ export default {
 		align-items: center;
 		justify-content: center;
 		width: 50px;
-		height: 100%;
-		margin: 0;
+		height: 46px;
+		margin: 2px 0;
 		padding: 0;
 		cursor: pointer;
 		opacity: .6;
